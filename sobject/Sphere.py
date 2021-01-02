@@ -1,4 +1,6 @@
 import numpy as np
+from utils import normalize
+
 from sobject.SceneObject import SceneObject
 
 
@@ -19,6 +21,11 @@ class Sphere(SceneObject):
             t1 = (-b + np.sqrt(delta)) / 2
             t2 = (-b - np.sqrt(delta)) / 2
             if t1 > 0 and t2 > 0:
-                return min(t1, t2)
+                object_distance = min(t1, t2)
+                return object_distance
 
         return None
+
+    def get_intersection_normal(self, ray, intersection_point):
+        intersection_normal = normalize(intersection_point - self.origin)
+        return intersection_normal
