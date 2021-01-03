@@ -1,5 +1,6 @@
 import numpy as np
 from timeit import default_timer
+from utils import normalize
 from random import randint
 
 from scomponent.Color import Color
@@ -7,6 +8,7 @@ from scomponent.Camera import Camera
 from scomponent.Screen import Screen
 from scomponent.Ray import Ray
 from scomponent.Light import Light
+from scomponent.Material import Material
 
 from sobject.Sphere import Sphere
 
@@ -32,25 +34,26 @@ def find_nearest_object_to_ray(scene_objects, ray):
 
 def main():
 
-    width = 300
-    height = 300
-    aspect_ratio = float(width / height)
+    mult = 1
+    width = int(1920 / mult)
+    height = int(1080 / mult)
+    aspect_ratio = float(width) / height
 
-    camera = Camera(x=0, y=0, z=-1)
-    screen = Screen(bottom=-1, top=1, left=1 / aspect_ratio, right=-1 / aspect_ratio, width=width, height=height)
+    camera = Camera(x=0, y=0, z=-1.5)
+    screen = Screen(bottom=-1 / aspect_ratio, top=1 / aspect_ratio, left=1, right=-1, width=width, height=height)
 
-    light = Light(x=0, y=5, z=2, color=Color(r=1.0, g=1.0, b=1.0))
+    light = Light(x=-4, y=-4, z=-2, material=Material(ambient=Color(1, 1, 1), diffuse=Color(1, 1, 1), specular=Color(1, 1, 1)))
 
     scene_objects = [
-        Sphere(origin=np.array([0, 0, 2]), radius=1.0, color=Color(r=0.25, g=0.25, b=1.0)),
-        #phere(origin=np.array([1, 0, 3]), radius=1.0, color=Color(r=0.25, g=1.0, b=0.25)),
-        #Sphere(origin=np.array([-1, 0, 1]), radius=1.0, color=Color(r=1.0, g=0.25, b=0.25)),
+        Sphere(origin=np.array([0, 0, 5]), radius=1.0,
+               material=Material(ambient=Color(0.1, 0, 0), diffuse=Color(0.7, 0, 0), specular=Color(1, 1, 1), shininess=100))
     ]
 
 
 
     print("Working...")
     starting_time = default_timer()
+
     for i, y in enumerate(np.linspace(screen.bottom, screen.top, screen.height)):
 
         for j, x in enumerate(np.linspace(screen.left, screen.right, screen.width)):
@@ -75,7 +78,27 @@ def main():
             if is_shadowed:
                 continue
 
-            screen.set_pixel_color(x=i, y=j, color=nearest_obj.color)
+            # RGB
+            illumination = np.zeros((3))
+
+
+            # ambient
+            illumination += nearest_obj.material.ambient * light.material.ambient
+
+            # diffuse
+            illumination += nearest_obj.material.diffuse * light.material.diffuse * np.dot(light_ray.direction, intersection_normal)
+
+            # specular
+            intersection_to_camera = normalize(camera.position - intersection_point)
+            H = normalize(light_ray.direction + intersection_to_camera)
+            illumination += nearest_obj.material.specular * light.material.specular * np.dot(intersection_normal, H) \
+                            ** (nearest_obj.material.shininess / 4)
+
+            illumination = np.clip(illumination, 0, 1)
+
+            screen.set_pixel_color(x=j, y=i, color=Color(illumination[0], illumination[1], illumination[2]))
+
+
 
             #print(intersection_point)
 

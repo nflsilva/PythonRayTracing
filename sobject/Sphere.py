@@ -6,10 +6,10 @@ from sobject.SceneObject import SceneObject
 
 class Sphere(SceneObject):
 
-    def __init__(self, origin, radius, color):
+    def __init__(self, origin, radius, material):
         self.origin = origin
         self.radius = radius
-        self.color = color
+        self.material = material
 
     def intersects_with_ray(self, ray):
 

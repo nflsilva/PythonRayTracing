@@ -16,7 +16,7 @@ class Screen:
         self.image = np.zeros((height, width, 3))
 
     def set_pixel_color(self, x, y, color):
-        self.image[x, y] = (color.r, color.g, color.b)
+        self.image[y, x] = (color.r, color.g, color.b)
 
 
     def write_to_file(self):
