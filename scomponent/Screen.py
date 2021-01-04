@@ -18,9 +18,6 @@ class Screen:
     def set_pixel_color(self, x, y, color):
         self.image[y, x] = (color.r, color.g, color.b)
 
-    def apply_antialiasing(self):
-        
-
 
     def write_to_file(self):
         plt.imsave("output.png", self.image)

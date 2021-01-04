@@ -11,6 +11,7 @@ from scomponent.Light import Light
 from scomponent.Material import Material
 
 from sobject.Sphere import Sphere
+from sobject.Triangle import Triangle
 
 
 def find_nearest_object_to_ray(scene_objects, ray):
@@ -31,32 +32,70 @@ def find_nearest_object_to_ray(scene_objects, ray):
     return nearest_object_distance, nearest_object
 
 
-
 def main():
 
-    mult = 1
-    width = int(1920 / mult)
-    height = int(1080 / mult)
-    aspect_ratio = float(width) / height
+    image_size_divider = 4
+    image_width = int(1920 / image_size_divider)
+    image_height = int(1080 / image_size_divider)
+    aspect_ratio = float(image_width) / image_height
 
     camera = Camera(x=0, y=0, z=-1.5)
-    screen = Screen(bottom=-1 / aspect_ratio, top=1 / aspect_ratio, left=1, right=-1, width=width, height=height)
+    screen = Screen(bottom=-1 / aspect_ratio, top=1 / aspect_ratio, left=-1, right=1, width=image_width, height=image_height)
 
     scene_lights = [
-        Light(x=4, y=-2, z=-2, material=Material(ambient=Color(.1, .1, .1), diffuse=Color(.7, .7, .7), specular=Color(1.0, 1.0, 1.0)))
+
+        Light(x=-5, y=2, z=0,
+              material=Material(ambient=Color(.1, .1, .1),
+                                diffuse=Color(.7, .7, .7),
+                                specular=Color(1.0, 1.0, 1.0))),
+
+        Light(x=2, y=0, z=5,
+              material=Material(ambient=Color(.1, .1, .1),
+                                diffuse=Color(.7, .7, .7),
+                                specular=Color(1.0, 1.0, 1.0)))
+
     ]
+
+    floor_material = Material(ambient=Color(.1, .1, .1),
+                              diffuse=Color(.7, .7, .7),
+                              specular=Color(1.0, 1.0, 1.0),
+                              shininess=100)
 
     scene_objects = [
-        Sphere(origin=np.array([0, 0, 5]), radius=1.0, material=Material(ambient=Color(.1, .0, .0), diffuse=Color(.7, .0, .0), specular=Color(1, 1, 1), shininess=100)),
-        Sphere(origin=np.array([1.0, 0, 3.5]), radius=0.15, material=Material(ambient=Color(.0, .1, .0), diffuse=Color(.0, .7, .0), specular=Color(1, 1, 1), shininess=25))
+
+        Triangle(point0=np.array([-1.0, -1.0, 10]),
+                 point1=np.array([1.0, -1.0, 10]),
+                 point2=np.array([.0, 1, 20]),
+                 material=floor_material),
+
+        Triangle(point0=np.array([-1.0, -1.0, 25]),
+                 point1=np.array([1.0, -1.0, 15]),
+                 point2=np.array([1.0, 1, 15]),
+                 material=floor_material),
+
+        Sphere(origin=np.array([0, 0, 5]),
+               radius=1.0,
+               material=Material(ambient=Color(.2, .0, .0),
+                                 diffuse=Color(.7, .0, .0),
+                                 specular=Color(1, 1, 1),
+                                 shininess=1000)),
+
+        Sphere(origin=np.array([-.5, .5, 3.5]),
+               radius=0.15,
+               material=Material(ambient=Color(.0, .1, .0),
+                                 diffuse=Color(.0, .7, .0),
+                                 specular=Color(1, 1, 1),
+                                 shininess=75)),
+
     ]
 
-
+    scene_objects = scene_objects[0:3]
+    scene_lights = scene_lights[0:1]
 
     print("Working...")
     starting_time = default_timer()
 
-    for i, y in enumerate(np.linspace(screen.bottom, screen.top, screen.height)):
+    for i, y in enumerate(np.linspace(screen.top, screen.bottom, screen.height)):
 
         for j, x in enumerate(np.linspace(screen.left, screen.right, screen.width)):
 
@@ -81,6 +120,8 @@ def main():
                 intersection_to_light_distance = np.linalg.norm(light.position - intersection_point)
                 is_shadowed = light_ray_intersection_distance < intersection_to_light_distance
 
+                #print(str(light_ray_intersection_distance) + " - " + str(intersection_to_light_distance))
+
                 if is_shadowed:
                     continue
 
@@ -93,8 +134,7 @@ def main():
                 # specular
                 intersection_to_camera = normalize(camera.position - intersection_point)
                 H = normalize(light_ray.direction + intersection_to_camera)
-                illumination += nearest_obj.material.specular * light.material.specular * np.dot(intersection_normal, H) \
-                                ** (nearest_obj.material.shininess / 4)
+                illumination += nearest_obj.material.specular * light.material.specular * np.dot(intersection_normal, H) ** (nearest_obj.material.shininess / 4)
 
             illumination = np.clip(illumination, 0, 1)
 
