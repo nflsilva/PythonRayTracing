@@ -34,7 +34,7 @@ def find_nearest_object_to_ray(scene_objects, ray):
 
 def main():
 
-    image_size_divider = 4
+    image_size_divider = 1
     image_width = int(1920 / image_size_divider)
     image_height = int(1080 / image_size_divider)
     aspect_ratio = float(image_width) / image_height
@@ -44,15 +44,15 @@ def main():
 
     scene_lights = [
 
-        Light(x=-5, y=2, z=0,
+        Light(x=-1.5, y=0.5, z=0,
               material=Material(ambient=Color(.1, .1, .1),
                                 diffuse=Color(.7, .7, .7),
                                 specular=Color(1.0, 1.0, 1.0))),
 
-        Light(x=2, y=0, z=5,
+        Light(x=0, y=0.75, z=0,
               material=Material(ambient=Color(.1, .1, .1),
-                                diffuse=Color(.7, .7, .7),
-                                specular=Color(1.0, 1.0, 1.0)))
+                                diffuse=Color(.2, .2, .2),
+                                specular=Color(0.5, 0.5, 0.5)))
 
     ]
 
@@ -63,25 +63,25 @@ def main():
 
     scene_objects = [
 
-        Triangle(point0=np.array([-1.0, -1.0, 10]),
-                 point1=np.array([1.0, -1.0, 10]),
-                 point2=np.array([.0, 1, 20]),
+        Triangle(point0=np.array([-1.0, -0.5, 0]),
+                 point1=np.array([1.0, -0.5, 0]),
+                 point2=np.array([-5.0, -0.5, 7.5]),
                  material=floor_material),
 
-        Triangle(point0=np.array([-1.0, -1.0, 25]),
-                 point1=np.array([1.0, -1.0, 15]),
-                 point2=np.array([1.0, 1, 15]),
+        Triangle(point0=np.array([-5.0, 5.0, 7.5]),
+                 point1=np.array([-5.0, -0.5, 7.5]),
+                 point2=np.array([1.0, -0.5, 0]),
                  material=floor_material),
 
-        Sphere(origin=np.array([0, 0, 5]),
-               radius=1.0,
+        Sphere(origin=np.array([-0.5, 0, 0.5]),
+               radius=0.25,
                material=Material(ambient=Color(.2, .0, .0),
                                  diffuse=Color(.7, .0, .0),
                                  specular=Color(1, 1, 1),
                                  shininess=1000)),
 
-        Sphere(origin=np.array([-.5, .5, 3.5]),
-               radius=0.15,
+        Sphere(origin=np.array([-1.0, -0.5 + 0.075, 1.0]),
+               radius=0.075,
                material=Material(ambient=Color(.0, .1, .0),
                                  diffuse=Color(.0, .7, .0),
                                  specular=Color(1, 1, 1),
@@ -89,7 +89,7 @@ def main():
 
     ]
 
-    scene_objects = scene_objects[0:3]
+    scene_objects = scene_objects[0:4]
     scene_lights = scene_lights[0:1]
 
     print("Working...")

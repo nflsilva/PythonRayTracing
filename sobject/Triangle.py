@@ -22,7 +22,7 @@ class Triangle(SceneObject):
         self.normal = normalize(np.cross(edge02, self.edge01))
         #self.normal = normalize(np.cross(self.edge01, edge02))
 
-        print(self.normal)
+        #print(self.normal)
         self.origin = -np.dot(self.normal, self.point0)
 
     def intersects_with_ray(self, ray):
@@ -34,24 +34,23 @@ class Triangle(SceneObject):
 
 
         if object_distance > 0:
-            return object_distance
 
 
             intersection_point = ray.direction * object_distance + ray.origin
 
             vp0 = intersection_point - self.point0
             c = np.cross(self.edge01, vp0)
-            if np.dot(c, self.normal) < 0:
+            if np.dot(c, self.normal) > 0:
                 return None
 
             vp1 = intersection_point - self.point1
             c = np.cross(self.edge12, vp1)
-            if np.dot(c, self.normal) < 0:
+            if np.dot(c, self.normal) > 0:
                 return None
 
             vp2 = intersection_point - self.point2
             c = np.cross(self.edge20, vp2)
-            if np.dot(c, self.normal) < 0:
+            if np.dot(c, self.normal) > 0:
                 return None
 
             return object_distance
