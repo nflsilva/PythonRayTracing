@@ -32,9 +32,7 @@ class Triangle(SceneObject):
 
         object_distance = -(numerator / denominator)
 
-
         if object_distance > 0:
-
 
             intersection_point = ray.direction * object_distance + ray.origin
 
